@@ -1,0 +1,4 @@
+<network>
+    <name>lan1</name>
+    <bridge name='br-lan1' stp='off' delay='0' />
+</network>

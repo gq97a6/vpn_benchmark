@@ -1,0 +1,7 @@
+#!/bin/sh
+# Enable networkd and disable wait-online
+
+set -e
+systemctl enable systemd-networkd
+systemctl disable systemd-networkd-wait-online.service
+systemctl mask systemd-networkd-wait-online.service

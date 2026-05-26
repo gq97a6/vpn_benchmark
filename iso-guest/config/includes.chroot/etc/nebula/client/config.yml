@@ -1,0 +1,56 @@
+pki:
+  ca: /etc/nebula/client/ca.crt
+  cert: /etc/nebula/client/client.crt
+  key: /etc/nebula/client/client.key
+
+static_host_map:
+  "10.20.0.1":
+    - "10.0.10.2:4242"
+
+lighthouse:
+  am_lighthouse: false
+  interval: 60
+  hosts:
+    - "10.20.0.1"
+
+listen:
+  host: "::"
+  port: 4242
+
+punchy:
+  punch: true
+
+relay:
+  am_relay: false
+  use_relays: false
+
+logging:
+  level: info
+  format: text
+
+tun:
+  disabled: false
+  dev: nebula
+  drop_local_broadcast: false
+  drop_multicast: false
+  tx_queue: 500
+  mtu: 1420
+
+firewall:
+  outbound_action: drop
+  inbound_action: drop
+
+  conntrack:
+    tcp_timeout: 12m
+    udp_timeout: 3m
+    default_timeout: 10m
+
+  outbound:
+    - port: any
+      proto: any
+      host: any
+
+  inbound:
+    - port: any
+      proto: any
+      host: any

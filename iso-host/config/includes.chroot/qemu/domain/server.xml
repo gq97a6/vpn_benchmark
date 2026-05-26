@@ -1,0 +1,45 @@
+<domain type='kvm'>
+    <name>server</name>
+    <memory unit='MiB'>2048</memory>
+    <vcpu placement='static' current='1'>4</vcpu>
+    <cputune>
+        <vcpupin vcpu='0' cpuset='8' />
+        <vcpupin vcpu='1' cpuset='9' />
+        <vcpupin vcpu='2' cpuset='10' />
+        <vcpupin vcpu='3' cpuset='11' />
+        <emulatorpin cpuset='16-19' />
+    </cputune>
+    <os>
+        <type arch='x86_64'>hvm</type>
+        <boot dev='cdrom' />
+    </os>
+    <features>
+        <acpi />
+    </features>
+    <devices>
+        <disk type='file' device='cdrom'>
+            <driver name='qemu' type='raw' />
+            <source file='/qemu/guest.iso' />
+            <target dev='hdc' bus='ide' />
+            <readonly />
+        </disk>
+        <interface type='network'>
+            <mac address='52:54:00:00:00:02' />
+            <source network='mgmt0' />
+            <target dev='server-mgmt0' />
+            <model type='virtio' />
+        </interface>
+        <interface type='network'>
+            <mac address='52:54:00:10:00:02' />
+            <source network='lan0' />
+            <target dev='server-lan0' />
+            <model type='virtio' />
+        </interface>
+        <serial type='pty'>
+            <target port='0' />
+        </serial>
+        <console type='pty'>
+            <target type='serial' port='0' />
+        </console>
+    </devices>
+</domain>

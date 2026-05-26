@@ -1,0 +1,5 @@
+#!/bin/sh
+# Configure bootloaders to enable unattended boot
+
+set -e
+echo timeout=0 >> boot/grub/grub.cfg

@@ -1,0 +1,51 @@
+<domain type='kvm'>
+    <name>router</name>
+    <memory unit='MiB'>2048</memory>
+    <vcpu placement='static' current='4'>4</vcpu>
+    <cputune>
+        <vcpupin vcpu='0' cpuset='4' />
+        <vcpupin vcpu='1' cpuset='5' />
+        <vcpupin vcpu='2' cpuset='6' />
+        <vcpupin vcpu='3' cpuset='7' />
+        <emulatorpin cpuset='16-19' />
+    </cputune>
+    <os>
+        <type arch='x86_64'>hvm</type>
+        <boot dev='cdrom' />
+    </os>
+    <features>
+        <acpi />
+    </features>
+    <devices>
+        <disk type='file' device='cdrom'>
+            <driver name='qemu' type='raw' />
+            <source file='/qemu/guest.iso' />
+            <target dev='hdc' bus='ide' />
+            <readonly />
+        </disk>
+        <interface type='network'>
+            <mac address='52:54:00:00:00:01' />
+            <source network='mgmt0' />
+            <target dev='router-mgmt0' />
+            <model type='virtio' />
+        </interface>
+        <interface type='network'>
+            <mac address='52:54:00:10:00:01' />
+            <source network='lan0' />
+            <target dev='router-lan0' />
+            <model type='virtio' />
+        </interface>
+        <interface type='network'>
+            <mac address='52:54:00:20:00:01' />
+            <source network='lan1' />
+            <target dev='router-lan1' />
+            <model type='virtio' />
+        </interface>
+        <serial type='pty'>
+            <target port='0' />
+        </serial>
+        <console type='pty'>
+            <target type='serial' port='0' />
+        </console>
+    </devices>
+</domain>

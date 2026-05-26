@@ -1,0 +1,22 @@
+#!/bin/sh
+# Configure infrastructure
+
+set -e
+
+# Enable for the target ISO boot, do not attempt to start in chroot
+systemctl enable libvirtd
+
+mkdir -p /etc/libvirt/qemu/networks/autostart
+mkdir -p /etc/libvirt/qemu/autostart
+
+# Define and autostart networks
+cp /qemu/network/*.xml /etc/libvirt/qemu/networks/
+ln -sf /etc/libvirt/qemu/networks/lan0.xml /etc/libvirt/qemu/networks/autostart/lan0.xml
+ln -sf /etc/libvirt/qemu/networks/lan1.xml /etc/libvirt/qemu/networks/autostart/lan1.xml
+ln -sf /etc/libvirt/qemu/networks/mgmt0.xml /etc/libvirt/qemu/networks/autostart/mgmt0.xml
+
+# Define and autostart domains
+cp /qemu/domain/*.xml /etc/libvirt/qemu/
+ln -sf /etc/libvirt/qemu/router.xml /etc/libvirt/qemu/autostart/router.xml
+ln -sf /etc/libvirt/qemu/server.xml /etc/libvirt/qemu/autostart/server.xml
+ln -sf /etc/libvirt/qemu/client.xml /etc/libvirt/qemu/autostart/client.xml

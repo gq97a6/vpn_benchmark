@@ -1,0 +1,5 @@
+[Match]
+MACAddress=52:54:00:20:00:01
+
+[Network]
+Address=10.0.20.1/24
