@@ -1,7 +1,7 @@
 # Automated VPN benchmark
 
 - Programming language - `Python`
-- Tested protocols - `Wireguard`, `Wireguard`, `OpenVPN`
+- Tested protocols - `Wireguard`, `Nebula`, `OpenVPN`
 - Used benchmarks - `iperf3`, `flent`
 - Hypervisor - `KVM/QEMU`, `virsh`
 - Network conditions degrading - `tc`
