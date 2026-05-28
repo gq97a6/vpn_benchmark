@@ -62,9 +62,9 @@ Variant B
 
 #### 1. Core script initial steps
 
-1. Executing `main.py`
-1. Attempt to disable CPU Boost and to lock CPU governor to performance
-1. Generate list of experiments and dump metadata to root results directory
+1. Executing `main.py`.
+1. Attempt to disable CPU Boost and to lock CPU governor to performance.
+1. Generate list of experiments and dump metadata to root results directory.
 
 #### 2. Steps executed for every experiment
 
@@ -72,7 +72,9 @@ Variant B
 1. Setup specific VPN
 1. Configure CPU frequency of cores dedicated to client and server VMs
 1. Configure network conditions
+1. Begin `sar` monitoring
 1. Run benchmarks
+1. Stop `sar` monitoring
 1. Extract results from client VM to host
 
 ## Results format
