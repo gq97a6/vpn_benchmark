@@ -34,6 +34,7 @@ python3-pip
 python3-venv
 linux-cpupower
 sysstat
+stress-ng
 linux-perf
 lsb-release
 gnupg
