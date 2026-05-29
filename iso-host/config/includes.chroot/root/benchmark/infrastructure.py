@@ -6,8 +6,8 @@ from shell import shell_on_guest, shell_on_host
 current_experiment: Experiment = Experiment()
 
 def _apply_network_impairments(delay, jitter, loss):
-    shell_on_guest(ROUTER_SSH, f"tc qdisc replace dev {ROUTER_SERVER_LAN_INTERFACE} root netem delay {delay} {jitter} loss {loss}")
-    shell_on_guest(ROUTER_SSH, f"tc qdisc replace dev {ROUTER_CLIENT_LAN_INTERFACE} root netem delay {delay} {jitter} loss {loss}")
+    shell_on_guest(ROUTER_SSH, f"tc qdisc replace dev {ROUTER_SERVER_LAN_INTERFACE} root netem delay {delay} {jitter} loss {loss} limit 100000")
+    shell_on_guest(ROUTER_SSH, f"tc qdisc replace dev {ROUTER_CLIENT_LAN_INTERFACE} root netem delay {delay} {jitter} loss {loss} limit 100000")
 
 def _lift_network_impairments():
     shell_on_guest(ROUTER_SSH, f"tc qdisc del dev {ROUTER_SERVER_LAN_INTERFACE} root")
