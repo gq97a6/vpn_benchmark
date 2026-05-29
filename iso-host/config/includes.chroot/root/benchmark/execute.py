@@ -57,4 +57,7 @@ def execute_experiments(experiments: list[Experiment], root_results_folder: str)
 
     # Run every experiment
     for index, experiment in enumerate(experiments):
+        print(f"====================================")
+        print(f"PROGRESS: {index} out of {len(experiments)}")
+        print(f"====================================")
         _execute_experiment(experiment, root_results_folder, index)

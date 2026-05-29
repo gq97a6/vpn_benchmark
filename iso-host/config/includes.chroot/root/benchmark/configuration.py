@@ -1,3 +1,4 @@
+REPEAT_COUNT = 10
 RESULTS_FOLDER = "/benchmark-results"
 
 ROUTER_SERVER_LAN_INTERFACE = "lan0"

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, replace
 from configuration import BASELINE
+import random
 
 @dataclass
 class Experiment:
@@ -10,39 +11,27 @@ class Experiment:
     cpu_freq: str = BASELINE["cpu_freq"]
     core_count: int = BASELINE["core_count"]
 
-def map_experiments(experiments: list[Experiment]) -> list[Experiment]:
-    return [
+def map_experiments(experiments: list[Experiment], repeat_count: int) -> list[Experiment]:
+    exps = [
         replace(exp, vpn=vpn)
         for exp in experiments
+        for _ in range(repeat_count)
         for vpn in ["none", "wireguard", "nebula", "openvpn"]
     ]
+    
+    return random.shuffle(exps)
+
 
 flat_experiments = [
-        Experiment(),
-        Experiment(delay="10ms"),
-        Experiment(delay="20ms"),
-        Experiment(delay="30ms"),
-        Experiment(delay="40ms"),
-        Experiment(delay="50ms"),
-        Experiment(delay="100ms"),
-        Experiment(delay="200ms"),
-        Experiment(delay="300ms"),
-        Experiment(delay="100ms", jitter="1ms"),
-        Experiment(delay="100ms", jitter="5ms"),
-        Experiment(delay="100ms", jitter="10ms"),
-        Experiment(delay="100ms", jitter="20ms"),
-        Experiment(delay="100ms", jitter="50ms"),
-        Experiment(delay="100ms", jitter="80ms"),
-        Experiment(loss="0.1%"),
-        Experiment(loss="0.2%"),
-        Experiment(loss="0.4%"),
-        Experiment(loss="0.8%"),
-        Experiment(loss="1.6%"),
-        Experiment(loss="3.2%"),
-        Experiment(cpu_freq="3.0GHz"),
-        Experiment(cpu_freq="2.0GHz"),
-        Experiment(cpu_freq="1.0GHz"),
-        Experiment(core_count=3),
-        Experiment(core_count=2),
-        Experiment(core_count=1),
+        Experiment(), # Baseline 1
+        Experiment(delay="50ms"), # Cross-country / inter-state
+        Experiment(delay="100ms"), # Transatlantic
+        Experiment(delay="300ms"), # Satellite / terrible LTE
+        Experiment(delay="100ms", jitter="20ms"), # Normal wireless variance
+        Experiment(delay="100ms", jitter="80ms"), # Extreme out-of-order delivery
+        Experiment(loss="0.1%"), # Bad cable
+        Experiment(loss="1.0%"), # Overloaded neighborhood node
+        Experiment(loss="3.0%"), # Virtually dead for TCP bulk transfer
+        Experiment(core_count=1, cpu_freq="2.0GHz"), # The Low-End Box 1
+        Experiment(core_count=2, cpu_freq="2.0GHz"), # The Low-End Box 2
     ]
