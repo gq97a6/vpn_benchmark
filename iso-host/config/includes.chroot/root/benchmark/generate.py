@@ -19,8 +19,8 @@ def map_experiments(experiments: list[Experiment], repeat_count: int) -> list[Ex
         for vpn in ["none", "wireguard", "nebula", "openvpn"]
     ]
     
-    return random.shuffle(exps)
-
+    random.shuffle(exps)
+    return exps
 
 flat_experiments = [
         Experiment(), # Baseline 1
