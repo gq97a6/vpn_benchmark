@@ -18,7 +18,7 @@ def map_experiments(experiments: list[Experiment], repeat_count: int) -> list[Ex
         for _ in range(repeat_count)
         for vpn in ["none", "wireguard", "nebula", "openvpn"]
     ]
-    
+
     random.shuffle(exps)
     return exps
 

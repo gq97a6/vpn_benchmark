@@ -22,16 +22,16 @@ def _recreate_domains(count):
     shell_on_host(f"virsh destroy router", False)
     shell_on_host(f"virsh destroy client", False)
     shell_on_host(f"virsh destroy server", False)
-    
+
     # Reconfigure core count
     shell_on_host(f"virsh setvcpus client {count} --config")
     shell_on_host(f"virsh setvcpus server {count} --config")
-    
+
     # Start guests
     shell_on_host(f"virsh start router")
     shell_on_host(f"virsh start client")
     shell_on_host(f"virsh start server")
-    
+
     # Wait for guests to come online
     shell_on_host(f"until ssh -o ConnectTimeout=1 -o BatchMode=yes router exit; do sleep 1; done", capture=True)
     shell_on_host(f"until ssh -o ConnectTimeout=1 -o BatchMode=yes client exit; do sleep 1; done", capture=True)
@@ -79,26 +79,24 @@ def update_infrastructure(experiment: Experiment):
     global current_experiment
     ce = current_experiment
 
-    # Check if domains need to be recreated
-    vm_recreate = ce.core_count != experiment.core_count
-
-    # Recreate with new core count
-    if vm_recreate:
+    # Recreate with new core count if required
+    if ce.core_count != experiment.core_count:
         _recreate_domains(experiment.core_count)
+        ce = Experiment()
 
     # Configure VPN if required
-    if vm_recreate or ce.vpn != experiment.vpn:
+    if ce.vpn != experiment.vpn:
         # If any curently running, stop it
         if ce.vpn != "none": _manage_vpn(ce.vpn, False)
         # Start new if requested
         if experiment.vpn != "none": _manage_vpn(experiment.vpn, True)
 
     # Configure CPU frequency
-    if vm_recreate or ce.cpu_freq != experiment.cpu_freq:
+    if ce.cpu_freq != experiment.cpu_freq:
         _set_cpu_freq(experiment.cpu_freq)
 
     # Configure network imapirments
-    if vm_recreate or ce.delay != experiment.delay or ce.jitter != experiment.jitter or ce.loss != experiment.loss:
+    if ce.delay != experiment.delay or ce.jitter != experiment.jitter or ce.loss != experiment.loss:
         _apply_network_impairments(experiment.delay, experiment.jitter, experiment.loss)
 
     current_experiment = experiment
