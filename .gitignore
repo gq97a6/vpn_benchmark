@@ -1,3 +1,4 @@
-/results
+process-results/results
+process-results/outputs
 __pycache__
 .vscode/settings.json
