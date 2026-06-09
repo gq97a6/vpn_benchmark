@@ -7,20 +7,20 @@ current_experiment: Experiment = Experiment()
 
 # Applies bandwidth shaping via TBF and network conditions via netem.
 # Limit 5000 caps the queue at ~7.5MB to prevent artificial black-holing.
-def _apply_network_impairments(bandwidth, delay, jitter, loss):
+def _apply_network_impairments(experiment: Experiment):
     for interface in [ROUTER_SERVER_LAN_INTERFACE, ROUTER_CLIENT_LAN_INTERFACE]:
         # Always wipe existing qdiscs first to prevent stacking conflicts
         shell_on_guest(ROUTER_SSH, f"tc qdisc del dev {interface} root 2>/dev/null || true")
 
-        if bandwidth == "0":
+        if experiment.bandwidth == "0":
             # No shaping, just impairments
-            cmd = f"tc qdisc add dev {interface} root handle 1: netem delay {delay} {jitter} loss {loss} limit 5000"
+            cmd = f"tc qdisc add dev {interface} root handle 1: netem delay {experiment.delay} {experiment.jitter} loss {experiment.loss} limit 5000"
         else:
             # Chain TBF (Bandwidth limit) -> Netem (Impairments)
             # burst 1mbit allows TCP to ramp up properly without dropping start-of-stream packets
             cmd = (
-                f"tc qdisc add dev {interface} root handle 1: tbf rate {bandwidth} burst 1mbit latency 50ms && "
-                f"tc qdisc add dev {interface} parent 1:1 handle 10: netem delay {delay} {jitter} loss {loss} limit 5000"
+                f"tc qdisc add dev {interface} root handle 1: tbf rate {experiment.bandwidth} burst 1mbit latency 50ms && "
+                f"tc qdisc add dev {interface} parent 1:1 handle 10: netem delay {experiment.delay} {experiment.jitter} loss {experiment.loss} limit 5000"
             )
 
         shell_on_guest(ROUTER_SSH, cmd)
@@ -113,6 +113,6 @@ def update_infrastructure(experiment: Experiment):
 
     # Configure network imapirments
     if ce.delay != experiment.delay or ce.jitter != experiment.jitter or ce.loss != experiment.loss:
-        _apply_network_impairments(experiment.delay, experiment.jitter, experiment.loss)
+        _apply_network_impairments(experiment)
 
     current_experiment = experiment
