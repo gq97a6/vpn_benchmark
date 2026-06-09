@@ -26,21 +26,19 @@ def map_experiments(experiments: list[Experiment], repeat_count: int) -> list[Ex
 @dataclass
 class Experiment:
     vpn: str = BASELINE["vpn"]
+    bandwidth: str = BASELINE["bandwidth"]
     delay: str = BASELINE["delay"]
     jitter: str = BASELINE["jitter"]
     loss: str = BASELINE["loss"]
     cpu_freq: str = BASELINE["cpu_freq"]
     core_count: int = BASELINE["core_count"]
-    
+
 flat_experiments = [
-        Experiment(), # Baseline 1
-        Experiment(delay="40ms", jitter="10ms", loss="0.5%"), # Realistic
-        Experiment(delay="50ms"), # Cross-country / inter-state
-        Experiment(delay="100ms"), # Transatlantic
-        Experiment(delay="300ms"), # Satellite / terrible LTE
-        Experiment(delay="100ms", jitter="80ms"), # Extreme out-of-order delivery
-        Experiment(loss="1.0%"), # Overloaded neighborhood node
-        Experiment(loss="3.0%"), # Virtually dead for TCP bulk transfer
-        Experiment(core_count=1, cpu_freq="2.0GHz"), # The Low-End Box 1
-        Experiment(core_count=2, cpu_freq="2.0GHz"), # The Low-End Box 2
-    ]
+    Experiment(), # Baseline: Raw throughput capabilities
+    Experiment(bandwidth="300mbit", delay="20ms", jitter="5ms", loss="0.1%"), # Realistic average residential fiber
+    Experiment(delay="20ms", jitter="50ms"), # Cryptographic sliding window stress (heavy out-of-order)
+    Experiment(delay="100ms", loss="2.0%"), # TCP retransmission overhead amplification
+    Experiment(core_count=1, cpu_freq="1.5GHz"), # Context-switch and crypto-threading starvation
+    Experiment(core_count=2, cpu_freq="2.0GHz"), # Low-end VPS tier
+    Experiment(bandwidth="50mbit", delay="10ms"), # Bufferbloat / narrow pipe queue saturation
+]

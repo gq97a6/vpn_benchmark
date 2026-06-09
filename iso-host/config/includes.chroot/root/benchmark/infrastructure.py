@@ -5,9 +5,25 @@ from shell import shell_on_guest, shell_on_host
 
 current_experiment: Experiment = Experiment()
 
-def _apply_network_impairments(delay, jitter, loss):
-    shell_on_guest(ROUTER_SSH, f"tc qdisc replace dev {ROUTER_SERVER_LAN_INTERFACE} root netem delay {delay} {jitter} loss {loss} limit 100000")
-    shell_on_guest(ROUTER_SSH, f"tc qdisc replace dev {ROUTER_CLIENT_LAN_INTERFACE} root netem delay {delay} {jitter} loss {loss} limit 100000")
+# Applies bandwidth shaping via TBF and network conditions via netem.
+# Limit 5000 caps the queue at ~7.5MB to prevent artificial black-holing.
+def _apply_network_impairments(bandwidth, delay, jitter, loss):
+    for interface in [ROUTER_SERVER_LAN_INTERFACE, ROUTER_CLIENT_LAN_INTERFACE]:
+        # Always wipe existing qdiscs first to prevent stacking conflicts
+        shell_on_guest(ROUTER_SSH, f"tc qdisc del dev {interface} root 2>/dev/null || true")
+
+        if bandwidth == "0":
+            # No shaping, just impairments
+            cmd = f"tc qdisc add dev {interface} root handle 1: netem delay {delay} {jitter} loss {loss} limit 5000"
+        else:
+            # Chain TBF (Bandwidth limit) -> Netem (Impairments)
+            # burst 1mbit allows TCP to ramp up properly without dropping start-of-stream packets
+            cmd = (
+                f"tc qdisc add dev {interface} root handle 1: tbf rate {bandwidth} burst 1mbit latency 50ms && "
+                f"tc qdisc add dev {interface} parent 1:1 handle 10: netem delay {delay} {jitter} loss {loss} limit 5000"
+            )
+
+        shell_on_guest(ROUTER_SSH, cmd)
 
 def _lift_network_impairments():
     shell_on_guest(ROUTER_SSH, f"tc qdisc del dev {ROUTER_SERVER_LAN_INTERFACE} root")

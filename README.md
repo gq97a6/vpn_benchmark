@@ -1,8 +1,10 @@
 # Automated VPN benchmark
 
+A highly reproducible, KVM-based testbed for benchmarking VPN protocols (Wireguard, Nebula, OpenVPN) under simulated hardware and network constraints. It uses custom Debian Live ISOs, strict CPU pinning, tc network degradation, and cpupower frequency capping to generate isolated metrics.
+
 - Programming language - `Python`
 - Tested protocols - `Wireguard`, `Nebula`, `OpenVPN`
-- Used benchmarks - `iperf3`, `flent`
+- Used benchmark - `flent`
 - Hypervisor - `KVM/QEMU`, `virsh`
 - Network conditions degrading - `tc`
 - CPU Clock rate capping - `cpupower`
@@ -46,6 +48,63 @@
 | `OpenVPN`   |           |        |            |
 | →           | `tun0`    | Server | 10.30.0.1  |
 | →           | `tun0`    | Client | 10.30.0.2  |
+
+#### Precautions
+
+* Diskless system (toram)
+* Core pining for QEMU emulation
+* Core isolation for QEMU guests
+* CPU performance and frequency scaling disabled
+* Randomized list of experiments to avoid thermal carryover
+* TCP congestion control set to `bbr` for guests
+* Per socket TCP buffers increased for guests
+* Each VPN configured with 1420 MTU
+
+## Experiments
+
+Each experiment is set of conditions under which benchmarks are run:
+```python
+class Experiment:
+    vpn: str = BASELINE["vpn"]
+    bandwidth: str = BASELINE["bandwidth"]
+    delay: str = BASELINE["delay"]
+    jitter: str = BASELINE["jitter"]
+    loss: str = BASELINE["loss"]
+    cpu_freq: str = BASELINE["cpu_freq"]
+    core_count: int = BASELINE["core_count"]
+```
+
+Each experiment is run for each protocol 10 times:
+```python
+Experiment(), # Baseline: Raw throughput capabilities
+Experiment(bandwidth="300mbit", delay="20ms", jitter="5ms", loss="0.1%"), # Realistic average residential fiber
+Experiment(delay="20ms", jitter="50ms"), # Cryptographic sliding window stress (heavy out-of-order)
+Experiment(delay="100ms", loss="2.0%"), # TCP retransmission overhead amplification
+Experiment(core_count=1, cpu_freq="1.5GHz"), # Context-switch and crypto-threading starvation
+Experiment(core_count=2, cpu_freq="2.0GHz"), # Low-end VPS tier
+Experiment(bandwidth="50mbit", delay="10ms"), # Bufferbloat / narrow pipe queue saturation
+```
+
+## Impairments
+
+Network impairments (executed on router node):
+```bash
+# No shaping, just impairments
+tc qdisc add dev {interface} root handle 1: netem delay {delay} {jitter} loss {loss} limit 5000
+
+# With bandwidth limit
+tc qdisc add dev {interface} root handle 1: tbf rate {bandwidth} burst 1mbit latency 50ms
+tc qdisc add dev {interface} parent 1:1 handle 10: netem delay {delay} {jitter} loss {loss} limit 5000
+```
+
+CPU impairments (executed on host while nodes are destroyed):
+```bash
+# Core count
+virsh setvcpus client {count} --config
+
+# Frequency
+cpupower -c {GUEST_CAPPED_CORES} frequency-set --min {freq}
+```
 
 ## Methodology
 
@@ -144,7 +203,7 @@ apt update && apt install -y qemu-kvm libvirt-daemon-system libvirt-clients brid
 │           │   ├── nebula # VPN configuration for both sides
 │           │   ├── openvpn # VPN configuration for both sides
 │           │   ├── wireguard # VPN configuration for both sides
-│           │   ├── sysctl.d # Enable routing for router virtual machine
+│           │   ├── sysctl.d # Enable routing, configure congestion control and buffers size
 │           │   └── systemd/network # Defines all interfaces with static MAC addresses
 │           └── root/.ssh # SSH configuration
 ├── iso-host

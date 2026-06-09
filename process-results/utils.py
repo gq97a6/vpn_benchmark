@@ -81,10 +81,13 @@ def parse_benchmark_to_dataframe(results_dir: Path):
     df_flent = pd.DataFrame(rows_flent)
 
     # Clean strings to numbers
-    df["loss"] = df["loss"].astype(str).str.replace("%", "", regex=False).astype(float)
-    df["cpu_freq"] = df["cpu_freq"].astype(str).str.replace("GHz", "", regex=False).astype(float)
-    df["delay"] = df["delay"].astype(str).str.replace("ms", "", regex=False).astype(int)
-    df["jitter"] = df["jitter"].astype(str).str.replace("ms", "", regex=False).astype(int)
+    for adf in df, df_flent:
+        adf["loss"] = adf["loss"].astype(str).str.replace("%", "", regex=False).astype(float)
+        adf["cpu_freq"] = adf["cpu_freq"].astype(str).str.replace("GHz", "", regex=False).astype(float)
+        adf["delay"] = adf["delay"].astype(str).str.replace("ms", "", regex=False).astype(int)
+        adf["jitter"] = adf["jitter"].astype(str).str.replace("ms", "", regex=False).astype(int)
+
+    # Enchance
     df["efficiency"] = (df["down"] + df["up"]) / df["cpu"]
 
     # Group reruns of same experiment
