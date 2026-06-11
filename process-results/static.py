@@ -9,7 +9,7 @@ thresholds = {
     "cpu": 5,
 }
 
-key_cols = ["vpn", "delay", "jitter", "loss", "cpu_freq", "core_count"]
+key_cols = ["vpn", "bandwidth", "delay", "jitter", "loss", "cpu_freq", "core_count"]
 
 data_cols =  [
     col + suf
@@ -19,24 +19,42 @@ data_cols =  [
 
 cols_to_keep = key_cols + data_cols
 
-# delay, jitter, loss, cpu_freq, core_count
-filter_masks = [
-    # 0. Delay in isolation
-    # delay, vpn
-    [(0, 0, 0, 4.0, 4), (50, 0, 0, 4.0, 4), (100, 0, 0, 4.0, 4), (300, 0, 0, 4.0, 4)],
-    # 1. Real network conditions
-    # delay, jitter, vpn
-    [(0, 0, 0, 4.0, 4), (100, 20, 0, 4.0, 4), (100, 80, 0, 4.0, 4)],
-    # 2. Packet loss in isolation
-    # loss", vpn
-    [(0, 0, 0, 4.0, 4), (0, 0, 0.1, 4.0, 4), (0, 0, 1.0, 4.0, 4), (0, 0, 3.0, 4.0, 4)],
-    # 3. Lower tier / low-end machines
-    # cpu_freq, core_count, vpn
-    [(0, 0, 0, 4.0, 4), (0, 0, 0, 2.0, 1), (0, 0, 0, 2.0, 2)],
-    # 4. Standard conditions
-    # delay, jitter, loss, vpn
-    [(0, 0, 0, 4.0, 4), (40, 10, 0.5, 4.0, 4)],
-    # 5. Extreme out-of-order delivery
-    # delay, jitter, vpn
-    [(0, 0, 0, 4.0, 4), (100, 80, 0, 4.0, 4)],
+# (bandwidth, delay, jitter, loss, cpu_freq, core_count)
+experiment_groups = [
+    # Realistic average residential fiber
+    (
+        [(0, 0, 0, 0.0, 4.0, 4), (300, 20, 5, 0.1, 4.0, 4)],
+        ["bandwidth", "delay", "jitter", "loss", "vpn"],
+        "residential_fiber"
+    ),
+    # Cryptographic sliding window stress (heavy out-of-order)
+    (
+        [(0, 0, 0, 0.0, 4.0, 4), (0, 20, 50, 0.0, 4.0, 4)],
+        ["delay", "jitter", "vpn"],
+        "extreme_ooo"
+    ),
+    # TCP retransmission overhead amplification
+    (
+        [(0, 0, 0, 0.0, 4.0, 4), (0, 100, 0, 2.0, 4.0, 4)],
+        ["delay", "loss", "vpn"],
+        "retransmission"
+    ),
+    # Context-switch and crypto-threading starvation
+    (
+        [(0, 0, 0, 0.0, 4.0, 4), (0, 0, 0, 0.0, 1.5, 1)],
+        ["cpu_freq", "core_count", "vpn"],
+        "starvation"
+    ),
+    # Low-end VPS tier
+    (
+        [(0, 0, 0, 0.0, 4.0, 4), (0, 0, 0, 0.0, 2.0, 2)],
+        ["cpu_freq", "core_count", "vpn"],
+        "low_end_vps"
+    ),
+    # Bufferbloat / narrow pipe queue saturation
+    (
+        [(0, 0, 0, 0.0, 4.0, 4), (50, 10, 0, 0.0, 4.0, 4)],
+        ["bandwidth", "delay", "vpn"],
+        "bufferbloat"
+    ),
 ]

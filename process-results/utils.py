@@ -37,6 +37,7 @@ def parse_flent(exp_dir):
 def process_experiment(exp_dir: Path, exp_meta: dict) -> tuple[dict, dict]:
     header = {
         "vpn": exp_meta.get("vpn"),
+        "bandwidth": exp_meta.get("bandwidth"),
         "delay": exp_meta.get("delay"),
         "jitter": exp_meta.get("jitter"),
         "loss": exp_meta.get("loss"),
@@ -82,10 +83,11 @@ def parse_benchmark_to_dataframe(results_dir: Path):
 
     # Clean strings to numbers
     for adf in df, df_flent:
-        adf["loss"] = adf["loss"].astype(str).str.replace("%", "", regex=False).astype(float)
-        adf["cpu_freq"] = adf["cpu_freq"].astype(str).str.replace("GHz", "", regex=False).astype(float)
+        adf["bandwidth"] = adf["bandwidth"].astype(str).str.replace("mbit", "", regex=False).astype(int)
         adf["delay"] = adf["delay"].astype(str).str.replace("ms", "", regex=False).astype(int)
         adf["jitter"] = adf["jitter"].astype(str).str.replace("ms", "", regex=False).astype(int)
+        adf["loss"] = adf["loss"].astype(str).str.replace("%", "", regex=False).astype(float)
+        adf["cpu_freq"] = adf["cpu_freq"].astype(str).str.replace("GHz", "", regex=False).astype(float)
 
     # Enchance
     df["efficiency"] = (df["down"] + df["up"]) / df["cpu"]
@@ -200,10 +202,11 @@ def filter_by_masks(df, masks):
     combined_mask = pd.Series(False, index=df.index)
     for f in masks:
         combined_mask |= (
-            (df['delay'] == f[0]) &
-            (df['jitter'] == f[1]) &
-            (df['loss'] == f[2]) &
-            (df['cpu_freq'] == f[3]) &
-            (df['core_count'] == f[4])
+            (df['bandwidth'] == f[0]) &
+            (df['delay'] == f[1]) &
+            (df['jitter'] == f[2]) &
+            (df['loss'] == f[3]) &
+            (df['cpu_freq'] == f[4]) &
+            (df['core_count'] == f[5])
         )
     return df.loc[combined_mask, cols_to_keep]
