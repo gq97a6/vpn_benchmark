@@ -30,7 +30,7 @@ def parse_flent(exp_dir):
     # Extract mean values
     ping = flent_raw.get("metadata", {}).get("SERIES_META", {}).get("Ping (ms) avg", {}).get("MEAN_VALUE", 0)
     down = flent_raw.get("metadata", {}).get("SERIES_META", {}).get("TCP download sum", {}).get("MEAN_VALUE", 0)
-    up = flent_raw.get("metadata", {}).get("SERIES_META", {}).get("TCP download sum", {}).get("MEAN_VALUE", 0)
+    up = flent_raw.get("metadata", {}).get("SERIES_META", {}).get("TCP upload sum", {}).get("MEAN_VALUE", 0)
 
     return down_series, up_series, ping_series, down, up, ping
 
