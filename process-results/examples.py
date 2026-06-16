@@ -23,7 +23,7 @@ db.close()
 df_sorted = df.round(3).sort_values(by=["vpn", "delay", "jitter", "loss", "cpu_freq", "core_count"], ascending=False)
 df_sorted.to_csv(project_dir / "outputs" / "raw.csv", index=False)
 
-# Filtering
+# Filtering and sorting
 selected_df = df[
     (df['core_count'] == 4) &
     True
