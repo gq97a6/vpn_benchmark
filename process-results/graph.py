@@ -20,4 +20,7 @@ dfs = [
     for group in experiment_groups
 ]
 
-#Explain project AI?
+# This project is a custom network performance benchmarking and analysis framework.
+# It automates the provisioning of a host/guest virtualised environment (QEMU/KVM),
+# applies controlled network impairments and CPU constraints, executes performance experiments,
+# and processes telemetry data (from `sar` and `flent`) into statistical summaries and visualisations.
