@@ -3,8 +3,6 @@ from configuration import BASELINE, CLIENT_SSH, SERVER_SSH, ROUTER_SSH, GUEST_CA
 from generate import Experiment
 from shell import shell_on_guest, shell_on_host
 
-current_experiment: Experiment = Experiment()
-
 # Applies bandwidth shaping via TBF and network conditions via netem.
 # Limit 5000 caps the queue at ~7.5MB to prevent artificial black-holing.
 def _apply_network_impairments(experiment: Experiment):
@@ -93,26 +91,18 @@ def preconfigure_host():
 
 def update_infrastructure(experiment: Experiment):
     global current_experiment
-    ce = current_experiment
 
-    # Recreate with new core count if required
-    if ce.core_count != experiment.core_count:
-        _recreate_domains(experiment.core_count)
-        ce = Experiment()
+    # Recreate domain every time
+    _recreate_domains(experiment.core_count)
 
-    # Configure VPN if required
-    if ce.vpn != experiment.vpn:
-        # If any curently running, stop it
-        if ce.vpn != "none": _manage_vpn(ce.vpn, False)
-        # Start new if requested
-        if experiment.vpn != "none": _manage_vpn(experiment.vpn, True)
+    # Configure VPN
+    if experiment.vpn != "none":
+        _manage_vpn(experiment.vpn, True)
 
     # Configure CPU frequency
-    if ce.cpu_freq != experiment.cpu_freq:
-        _set_cpu_freq(experiment.cpu_freq)
+    _set_cpu_freq(experiment.cpu_freq)
 
     # Configure network imapirments
-    if ce.delay != experiment.delay or ce.jitter != experiment.jitter or ce.loss != experiment.loss:
-        _apply_network_impairments(experiment)
+    _apply_network_impairments(experiment)
 
     current_experiment = experiment
