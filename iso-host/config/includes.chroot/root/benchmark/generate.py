@@ -34,11 +34,10 @@ class Experiment:
     core_count: int = BASELINE["core_count"]
 
 flat_experiments = [
-    Experiment(), # Baseline: Raw throughput capabilities
-    Experiment(bandwidth="300mbit", delay="20ms", jitter="5ms", loss="0.1%"), # Realistic average residential fiber
-    Experiment(delay="20ms", jitter="50ms"), # Cryptographic sliding window stress (heavy out-of-order)
-    Experiment(delay="100ms", loss="2.0%"), # TCP retransmission overhead amplification
+    Experiment(), # Baseline
+    Experiment(bandwidth="1000mbit", delay="20ms", jitter="5ms", loss="0.1%"), # Realistic average residential fiber
+    Experiment(delay="50ms", jitter="10ms"), # Cryptographic sliding window stress (out-of-order)
+    Experiment(delay="100ms"), # Trans-Atlantic link (BDP stress)
     Experiment(core_count=1, cpu_freq="1.5GHz"), # Context-switch and crypto-threading starvation
     Experiment(core_count=2, cpu_freq="2.0GHz"), # Low-end VPS tier
-    Experiment(bandwidth="50mbit", delay="10ms"), # Bufferbloat / narrow pipe queue saturation
 ]
