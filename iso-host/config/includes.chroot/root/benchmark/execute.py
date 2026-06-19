@@ -28,19 +28,19 @@ def _execute_experiment(experiment: Experiment, root_results_folder, index):
     shell_on_guest(CLIENT_SSH, f"mkdir -p {results_folder}")
 
     # Start servers
-    shell_on_guest(SERVER_SSH, "netserver > /dev/null 2>&1 &")
-    #shell_on_guest(SERVER_SSH, "iperf3 -s > /dev/null 2>&1 &")
+    #shell_on_guest(SERVER_SSH, "netserver > /dev/null 2>&1 &")
+    shell_on_guest(SERVER_SSH, "iperf3 -s > /dev/null 2>&1 &")
     sleep(1)
 
     # Benchmark
     _begin_monitoring(results_folder)
-    shell_on_guest(CLIENT_SSH, f"flent rrul -H {IP_SERVER[experiment.vpn]} -l 120 -D {results_folder}")
-    #shell_on_guest(CLIENT_SSH, f"iperf3 -c {IP_SERVER[experiment.vpn]} -t 60 -J --logfile {results_folder}/iperf.json")
+    #shell_on_guest(CLIENT_SSH, f"flent rrul -H {IP_SERVER[experiment.vpn]} -l 120 -D {results_folder}")
+    shell_on_guest(CLIENT_SSH, f"iperf3 -c {IP_SERVER[experiment.vpn]} -t 120 -P 4 -J --logfile {results_folder}/iperf.json")
     _stop_monitoring(results_folder)
 
     # Stop servers
-    #shell_on_guest(SERVER_SSH, "pkill iperf3", check=False, capture=True)
-    shell_on_guest(SERVER_SSH, "pkill netserver", check=False, capture=True)
+    shell_on_guest(SERVER_SSH, "pkill iperf3", check=False, capture=True)
+    #shell_on_guest(SERVER_SSH, "pkill netserver", check=False, capture=True)
 
     # Extract results to host
     shell_on_host(f"scp -r {CLIENT_SSH}:{results_folder} {root_results_folder}") 
