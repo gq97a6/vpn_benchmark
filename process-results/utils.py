@@ -198,15 +198,12 @@ def df_combined_to_csv(
 
     return output.getvalue()
 
-def filter_by_masks(df, masks):
-    combined_mask = pd.Series(False, index=df.index)
-    for f in masks:
-        combined_mask |= (
-            (df['bandwidth'] == f[0]) &
-            (df['delay'] == f[1]) &
-            (df['jitter'] == f[2]) &
-            (df['loss'] == f[3]) &
-            (df['cpu_freq'] == f[4]) &
-            (df['core_count'] == f[5])
-        )
-    return df.loc[combined_mask, cols_to_keep]
+def filter_by_mask(df, mask):
+    return df[
+        (df['bandwidth'] == mask[0]) &
+        (df['delay'] == mask[1]) &
+        (df['jitter'] == mask[2]) &
+        (df['loss'] == mask[3]) &
+        (df['cpu_freq'] == mask[4]) &
+        (df['core_count'] == mask[5])
+    ]

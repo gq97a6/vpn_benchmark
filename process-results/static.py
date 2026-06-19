@@ -20,41 +20,40 @@ data_cols =  [
 cols_to_keep = key_cols + data_cols
 
 # (bandwidth, delay, jitter, loss, cpu_freq, core_count)
-experiment_groups = [
-    # Realistic average residential fiber
-    (
-        [(0, 0, 0, 0.0, 4.0, 4), (300, 20, 5, 0.1, 4.0, 4)],
-        ["bandwidth", "delay", "jitter", "loss", "vpn"],
-        "residential_fiber"
-    ),
-    # Cryptographic sliding window stress (heavy out-of-order)
-    (
-        [(0, 0, 0, 0.0, 4.0, 4), (0, 20, 50, 0.0, 4.0, 4)],
-        ["delay", "jitter", "vpn"],
-        "extreme_ooo"
-    ),
-    # TCP retransmission overhead amplification
-    (
-        [(0, 0, 0, 0.0, 4.0, 4), (0, 100, 0, 2.0, 4.0, 4)],
-        ["delay", "loss", "vpn"],
-        "retransmission"
-    ),
-    # Context-switch and crypto-threading starvation
-    (
-        [(0, 0, 0, 0.0, 4.0, 4), (0, 0, 0, 0.0, 1.5, 1)],
-        ["cpu_freq", "core_count", "vpn"],
-        "starvation"
-    ),
-    # Low-end VPS tier
-    (
-        [(0, 0, 0, 0.0, 4.0, 4), (0, 0, 0, 0.0, 2.0, 2)],
-        ["cpu_freq", "core_count", "vpn"],
-        "low_end_vps"
-    ),
-    # Bufferbloat / narrow pipe queue saturation
-    (
-        [(0, 0, 0, 0.0, 4.0, 4), (50, 10, 0, 0.0, 4.0, 4)],
-        ["bandwidth", "delay", "vpn"],
-        "bufferbloat"
-    ),
-]
+experiment_groups = {
+    "baseline": {
+        "mask": (0, 0, 0, 0, 4.0, 4),
+        "cols": ["bandwidth", "delay", "jitter", "loss", "vpn"],
+        "desc": "Baseline"
+    },
+    "residential_fiber": {
+        "mask": (300, 20, 5, 0.1, 4.0, 4),
+        "cols": ["bandwidth", "delay", "jitter", "loss", "vpn"],
+        "desc": "Realistic average residential fiber (300 MBps | 20 ms delay | 5 ms jitter | 0.1% loss)"
+    },
+    "extreme_ooo": {
+        "mask": (0, 20, 50, 0.0, 4.0, 4),
+        "cols": ["delay", "jitter", "vpn"],
+        "desc": "Cryptographic sliding window stress (20 ms delay | 50 ms jitter)"
+    },
+    "retransmission": {
+        "mask": (0, 100, 0, 2.0, 4.0, 4),
+        "cols": ["delay", "loss", "vpn"],
+        "desc": "TCP retransmission overhead amplification (100 ms delay | 2% loss)"
+    },
+    "starvation": {
+        "mask": (0, 0, 0, 0.0, 1.5, 1),
+        "cols": ["cpu_freq", "core_count", "vpn"],
+        "desc": "Context-switch and crypto-threading starvation (1.5 GHz | 1 core)"
+    },
+    "low_end_vps": {
+        "mask": (0, 0, 0, 0.0, 2.0, 2),
+        "cols": ["cpu_freq", "core_count", "vpn"],
+        "desc": "Low-end VPS tier (2.0 GHz | 2 core)"
+    },
+    "bufferbloat": {
+        "mask": (50, 10, 0, 0.0, 4.0, 4),
+        "cols": ["bandwidth", "delay", "vpn"],
+        "desc": "Bufferbloat / narrow pipe queue saturation (50 MBps | 10 ms delay)"
+    },
+}
