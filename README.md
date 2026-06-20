@@ -4,7 +4,7 @@ A highly reproducible, KVM-based testbed for benchmarking VPN protocols (Wiregua
 
 - Programming language - `Python`
 - Tested protocols - `Wireguard`, `Nebula`, `OpenVPN`
-- Used benchmark - `flent`
+- Used benchmark - `iperf3`
 - Hypervisor - `KVM/QEMU`, `virsh`
 - Network conditions degrading - `tc`
 - CPU Clock rate capping - `cpupower`
@@ -58,6 +58,8 @@ A highly reproducible, KVM-based testbed for benchmarking VPN protocols (Wiregua
 * Randomized list of experiments to avoid thermal carryover
 * TCP congestion control set to `bbr` for guests
 * Per socket TCP buffers increased for guests
+* Client and server virtual machines recrated from scratch for every experiment
+* iperf3 is run with four parallel streams
 * Each VPN configured with 1420 MTU
 
 ## Experiments
