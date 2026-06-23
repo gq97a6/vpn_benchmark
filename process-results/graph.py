@@ -5,8 +5,6 @@ from utils import filter_by_mask
 from utils import df_combined_to_markdown
 from utils import df_combined_to_csv
 from static import *
-from matplotlib.widgets import RadioButtons
-import math
 
 df, df_mean, df_sd, df_rsd, df_combined, df_flent = parse_benchmark_to_dataframe(project_dir / "results")
 
@@ -45,9 +43,11 @@ for filename, meta in experiment_groups.items():
                 # This logic assumes the 10 columns represent the 10 experiments/runs per VPN
                 if c < len(vpn_data):
                     row_idx = vpn_data.index[c]
-                    series_data = vpn_data.loc[row_idx, "down"]
+                    series_data1 = vpn_data.loc[row_idx, "down"]
+                    series_data2 = vpn_data.loc[row_idx, "up"]
                     
-                    ax.plot(series_data)
+                    ax.plot(series_data1)
+                    ax.plot(series_data2)
                     ax.set_title(f"V: {vpn_val}", fontsize=8)
                     ax.tick_params(labelsize=6)
                 else:

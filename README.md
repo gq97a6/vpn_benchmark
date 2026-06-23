@@ -89,7 +89,7 @@ Experiment(bandwidth="50mbit", delay="10ms"), # Bufferbloat / narrow pipe queue 
 
 ## Impairments
 
-Network impairments (executed on router node):
+Network impairments examples (executed on router node):
 ```bash
 # No shaping, just impairments
 tc qdisc add dev {interface} root handle 1: netem delay {delay} {jitter} loss {loss} limit 5000
@@ -99,7 +99,7 @@ tc qdisc add dev {interface} root handle 1: tbf rate {bandwidth} burst 1mbit lat
 tc qdisc add dev {interface} parent 1:1 handle 10: netem delay {delay} {jitter} loss {loss} limit 5000
 ```
 
-CPU impairments (executed on host while nodes are destroyed):
+CPU impairments examples (executed on host while nodes are destroyed):
 ```bash
 # Core count
 virsh setvcpus client {count} --config

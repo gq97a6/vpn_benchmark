@@ -22,7 +22,6 @@ def map_experiments(experiments: list[Experiment], repeat_count: int) -> list[Ex
     random.shuffle(exps)
     return exps
 
-
 @dataclass
 class Experiment:
     vpn: str = BASELINE["vpn"]

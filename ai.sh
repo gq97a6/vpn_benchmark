@@ -4,11 +4,15 @@
 EXCLUDE=(
     ".git"
     "ai.sh"
+    "process-results"
+    "LICENSE"
     "iso-guest/config/includes.chroot/etc/wireguard"
     "iso-guest/config/includes.chroot/etc/nebula"
     "iso-guest/config/includes.chroot/etc/openvpn"
     "iso-host/config/includes.chroot/root/benchmark/__pycache__"
 )
+
+TREE_PATTERN=$(printf '%s\n' "${EXCLUDE[@]}" | sed 's/\./\\./g' | paste -sd '|' -)
 
 PRUNE_EXPR=""
 for item in "${EXCLUDE[@]}"; do
@@ -20,12 +24,12 @@ for item in "${EXCLUDE[@]}"; do
 done
 
 echo "--- Project Tree ---"
-tree
+tree -I "$TREE_PATTERN"
 
 echo -e "\n--- File Contents ---"
 find . \( $PRUNE_EXPR \) -prune -o -type f -print | while read -r file; do
     echo "FILE: $file"
-    echo "------------------------------------"
+    echo "------------------------------------------------------------------------"
     cat "$file"
-    echo -e "\n------------------------------------\n"
+    echo -e "\n------------------------------------------------------------------------\n"
 done
